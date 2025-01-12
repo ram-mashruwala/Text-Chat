@@ -1,0 +1,143 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    background: #f0f2f5;
+  }
+  
+  .container {
+    display: flex;
+    width: 100%;
+  }
+  
+  .sidebar {
+    width: 30%;
+    background: #ffffff;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sidebar .header {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #007bff;
+    color: white;
+  }
+  
+  .chat-list {
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .chat {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+  }
+  
+  .chat:hover {
+    background: #f9f9f9;
+  }
+  
+  .chat img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .chat-info {
+    flex: 1;
+  }
+  
+  .chat-info h2 {
+    font-size: 16px;
+  }
+  
+  .chat-info p {
+    font-size: 14px;
+    color: gray;
+  }
+  
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .chat-header {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    background: #007bff;
+    color: white;
+  }
+  
+  .chat-header img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    background: #f7f9fc;
+  }
+  
+  .message {
+    margin-bottom: 10px;
+    max-width: 60%;
+  }
+  
+  .message p {
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  .message.sent p {
+    background: #dcf8c6;
+  }
+  
+  .message.received p {
+    background: #fff;
+  }
+  
+  .message span {
+    font-size: 12px;
+    color: gray;
+  }
+  
+  .message-input {
+    display: flex;
+    padding: 10px;
+    background: #ffffff;
+    border-top: 1px solid #ddd;
+  }
+  
+  .message-input button,
+  .message-input input {
+    margin: 0 5px;
+  }
+  
+  .message-input input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    outline: none;
+  }
+  
