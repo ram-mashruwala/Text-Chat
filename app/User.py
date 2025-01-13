@@ -1,10 +1,11 @@
 import socket
 import time
 import threading
+import sys
 
 HEADER = 64
 PORT = 5050
-SERVER = "127.0.0.1"
+SERVER = "23.16.174.126"
 FORMAT = "utf-8"
 DISCONNECT_MESSAGE = "!DISCONNECT"
 ADDR = (SERVER, PORT)
@@ -47,6 +48,7 @@ def start():
         if msg == "quit()":
             send(DISCONNECT_MESSAGE)
             print("[DISCONNECTING] Disconnecting from the server...")
+            sys.exit()
             break
         send(f"{username}: {msg}")
 
