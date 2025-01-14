@@ -5,5 +5,8 @@ from flask import render_template
 @app.route("/")
 @app.route("/index")
 def index():
-    user = {"username":"Ram"}
-    return render_template("index.html", good="OWIEJFOWEJIEFOWEJI", user=user)
+    return render_template("template.html")
+
+@app.route("/login")
+def login():
+    return render_template("login.html")
