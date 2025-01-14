@@ -1,7 +1,5 @@
 import socket
-import time
 import threading
-import sys
 
 HEADER = 64
 PORT = 5050
@@ -10,12 +8,8 @@ FORMAT = "utf-8"
 DISCONNECT_MESSAGE = "!DISCONNECT"
 ADDR = (SERVER, PORT)
 
-username = input("What is your username? ")
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(ADDR)
-
-def send(msg):
+def send(msg, client):
     """Send a message to the server."""
     message = msg.encode(FORMAT)
     msg_length = len(message)
@@ -24,7 +18,7 @@ def send(msg):
     client.send(send_length)
     client.send(message)
 
-def receive():
+def receive(client):
     """Receive messages from the server and log them."""
     while True:
         try:
@@ -37,11 +31,11 @@ def receive():
             print(f"[ERROR] {e}")
             break
 
-def start():
+def start(username):
     """Start the chat client."""
-    with open(f"chat_{username}.txt", "w") as f:  # Reset file at the start
-        f.write(f"Chat log for {username}:\n")
-    thread = threading.Thread(target=receive, daemon=True)
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect(ADDR)
+    thread = threading.Thread(target=receive, daemon=True, args=(client))
     thread.start()
     while True:
         msg = input("> ")
@@ -50,9 +44,12 @@ def start():
             print("[DISCONNECTING] Disconnecting from the server...")
             client.close()
             break
-        send(f"{username}: {msg}")
+        send(f"{username}: {msg}", client=client)
 
-start()
+if __name__ == "__main__":
+    username = input("What is your username? ")
+    start(username)
+
 
 # import socket
 # import time

@@ -1,6 +1,7 @@
 from app import app
 import app.backend.backend as b
 from flask import render_template
+import app.backend.User as user
 
 @app.route("/")
 @app.route("/index")
