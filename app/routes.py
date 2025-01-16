@@ -2,7 +2,7 @@ from app import app
 import app.backend.backend as b
 from flask import render_template, flash, redirect
 import app.backend.User as user
-from app.forms import LoginForm
+from app.backend.forms import LoginForm
 
 @app.route("/")
 @app.route("/index")
