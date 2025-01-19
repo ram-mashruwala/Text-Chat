@@ -4,11 +4,12 @@ from flask import render_template, flash, redirect
 import app.backend.User as user
 from app.backend.forms import LoginForm
 
-@app.route("/")
+
 @app.route("/index")
 def index():
     return render_template("template.html")
 
+@app.route("/")
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
