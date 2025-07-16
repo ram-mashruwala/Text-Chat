@@ -9,7 +9,7 @@ from app.backend.forms import LoginForm
 def index():
     return render_template("template.html")
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
