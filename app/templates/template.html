@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+
 {% block content %}
 <div class="container">
     <!-- Sidebar -->
@@ -48,10 +49,18 @@
         </div>
         <div class="message-input">
             <button>😊</button>
-            <input type="text" placeholder="Type a message">
-            <button>➤</button>
+            <form class="message-send">
+                <input type="text" placeholder="Type a message">
+                <button>➤</button>
+            </form>
         </div>
     </div>
 </div>
+<script src="../static/script.js"></script>
 
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="../static/style.css">
+<title>TextChat :D</title>
 {% endblock %}
