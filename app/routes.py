@@ -1,8 +1,7 @@
-from app import app
-import app.backend.backend as b
-from flask import render_template, flash, redirect
-import app.backend.User as user
+from app import app, socketio
+from flask import render_template, flash, redirect, request
 from app.backend.forms import LoginForm
+from flask_socketio import emit
 
 
 @app.route("/index")
@@ -18,3 +17,11 @@ def login():
             form.username.data, form.remember_me.data))
         return redirect("/index")
     return render_template("login.html", title="Ram", form=form)
+
+@socketio.event
+def connect(auth):
+    print(f"Connected on server end, with connection id being {request.sid}")
+
+@socketio.event
+def disconnect():
+    print(f"Disconnected on server end, with connection id being {request.sid}")
