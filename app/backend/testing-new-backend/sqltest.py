@@ -2,7 +2,7 @@ import sqlalchemy as sa
 from datetime import datetime, timezone
 from typing import Optional
 import sqlalchemy.orm as orm
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 from sqlalchemy import ForeignKey, String
 
 engine = sa.create_engine("sqlite+pysqlite:///:memory:", echo=True)
@@ -38,7 +38,7 @@ class Post(Base):
     receiver: Mapped["User"] = relationship(back_populates="received_messages")
 
     def __repr__(self) -> str:
-        return f"<Post id= {self.id!r}, content={self.content!r} author={self.author.username!r}>"
+        return f"<Post id={self.id!r}, content={self.content!r} author={self.author.username!r}>"
 
 
 
@@ -49,7 +49,7 @@ def main():
     # test_post1 = Post(content="This is a Test Post", author=test_user1)
     # test_post2 = Post(content="This is another Test Post", author=test_user1)
     # test_post3 = Post(content="This is the third Test Post", author=test_user2)
-    #
+
     # print(test_user1)
     # print(test_user2)
     # print(test_post1)
