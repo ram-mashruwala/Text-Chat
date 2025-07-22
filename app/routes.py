@@ -4,17 +4,17 @@ from app.backend.forms import LoginForm
 from flask_socketio import emit, send
 
 
+@app.route("/")
 @app.route("/index")
 def index():
     return render_template("template.html")
 
-@app.route("/", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        flash('Login requested for user {}, remember_me={}'.format(
-            form.username.data, form.remember_me.data))
+        flash('Login requested for user {}'.format(
+            form.username.data))
         return redirect("/index")
     return render_template("login.html", title="Ram", form=form)
 
