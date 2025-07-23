@@ -1,4 +1,11 @@
-from app import app, socketio
+from app import app, socketio, db
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
+from app.models import User, Messages, Chats
+
+@app.shell_context_processor
+def make_shell_context():
+    return {'sa': sa, 'orm': orm, 'db': db, 'User': User, 'Messages':Messages, 'Chats':Chats}
 
 if __name__ == "__main__":
     socketio.run(app, host="0.0.0.0", ssl_context="adhoc")
