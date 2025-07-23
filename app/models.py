@@ -1,3 +1,4 @@
+from werkzeug.security import generate_password_hash, check_password_hash
 from typing import List
 from app import db
 from sqlalchemy import Column, ForeignKey, Table, String
@@ -15,6 +16,12 @@ class User(db.Model):
     password_hash: Mapped[str] = mapped_column(String(256))
     email: Mapped[str] = mapped_column(index=True)
     chats: Mapped[List["Chats"]] = relationship(secondary=association_table, back_populates="users")
+
+    def set_password(self, password: str) -> None:
+        self.password_hash = generate_password_hash(password=password)
+
+    def check_password(self, password: str) -> bool:
+        return check_password_hash(self.password_hash, password=password)
 
 class Chats(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
