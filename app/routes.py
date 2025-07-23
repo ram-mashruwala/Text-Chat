@@ -1,6 +1,6 @@
 from app import app, socketio
 from flask import render_template, flash, redirect, request, session
-from app.forms import LoginForm
+from app.forms import LoginForm, RegisterForm
 from flask_socketio import emit
 
 
@@ -17,6 +17,13 @@ def login():
             form.username.data))
         return redirect("/index")
     return render_template("login.html", title="Ram", form=form)
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        return redirect("/index")
+    return render_template("register.html", title="Register", form=form)
 
 @socketio.event
 def connect(auth):

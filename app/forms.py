@@ -11,7 +11,7 @@ class RegisterForm(FlaskForm):
     username = StringField(label="Username", validators=[DataRequired()])
     email = StringField(label="Email", validators=[DataRequired(), Email()])
     password = StringField(label="Password", validators=[DataRequired()])
-    resubmit_password = StringField(label="resubmit_password", validators=[DataRequired(), EqualTo("password")])
+    resubmit_password = StringField(label="Resubmit Password", validators=[DataRequired(), EqualTo("password")])
     submit = SubmitField(label="Register")
 
     # This is here to remember additional functionality
