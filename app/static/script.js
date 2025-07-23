@@ -17,7 +17,7 @@ form.addEventListener("submit", (e) => {
 	const input = form[0];
 	// Probably remove the login thingy once we get login page to work
 	if (loggedIn == false) {
-		socket.emit("getUserName", { "username": input.value })
+		socket.emit("setUserName", { "username": input.value })
 		loggedIn = true
 	} else {
 		socket.emit("message", {

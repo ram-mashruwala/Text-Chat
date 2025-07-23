@@ -1,7 +1,7 @@
 from app import app, socketio
 from flask import render_template, flash, redirect, request, session
-from app.backend.forms import LoginForm
-from flask_socketio import emit, send
+from app.forms import LoginForm
+from flask_socketio import emit
 
 
 @app.route("/")
@@ -32,7 +32,7 @@ def message(data):
     emit("message", {"message": data["message"], "author": session["username"]}, broadcast=True, include_self=False)
     print(data)
 
-@socketio.on("getUserName")
+@socketio.on("setUserName")
 def getUserName(data):
     session["username"] = data["username"]
     print(session["username"])
