@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 
 class LoginForm(FlaskForm):
     username = StringField(label="Username", validators=[DataRequired()])
@@ -9,12 +9,10 @@ class LoginForm(FlaskForm):
 
 class RegisterForm(FlaskForm):
     username = StringField(label="Username", validators=[DataRequired()])
-    # We don't need this, but we have it just to look professional
-    email = StringField(label="Email", validators=[DataRequired()])
-    phoneNumber = StringField(label="phoneNumber", validators=[DataRequired()])
-    age = IntegerField(label="age", validators=[DataRequired()])
-
-    # We need the rest
+    email = StringField(label="Email", validators=[DataRequired(), Email()])
     password = StringField(label="Password", validators=[DataRequired()])
-    resubmit_password = StringField(label="resubmit_password", validators=[DataRequired()])
+    resubmit_password = StringField(label="resubmit_password", validators=[DataRequired(), EqualTo("password")])
     submit = SubmitField(label="Register")
+
+    # This is here to remember additional functionality
+    # def validate_<field_name>: This will tell WTForm to also use this to validate the user input on given <field_name>
