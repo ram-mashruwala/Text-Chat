@@ -1,7 +1,5 @@
 from typing import List
 from app import db
-import sqlalchemy as sa
-import sqlalchemy.orm as orm
 from sqlalchemy import Column, ForeignKey, Table, String
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
