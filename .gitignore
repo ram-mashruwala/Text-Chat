@@ -204,3 +204,6 @@ pyrightconfig.json
 
 # Ignore .hintrc file
 .hintrc
+
+# Ignore Database
+app.db
