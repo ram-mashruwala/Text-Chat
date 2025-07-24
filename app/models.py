@@ -21,12 +21,16 @@ class User(UserMixin, db.Model):
     email: Mapped[str] = mapped_column(String(120), index=True, unique=True)
     chats: Mapped[Optional[List["Chats"]]] = relationship(secondary=association_table, back_populates="users")
 
-    def set_password(self, password: str) -> None:
+    def set_password(self, password: Optional[str]) -> None:
+        if not password:
+            return
         self.password_hash = generate_password_hash(password=password)
 
-    def check_password(self, password: str) -> bool:
-        if not self.password_hash:
+    def check_password(self, password: Optional[str]) -> bool:
+        # This is to make my lsp happy
+        if not self.password_hash or not password:
             return False
+
         return check_password_hash(self.password_hash, password=password)
 
     def __repr__(self) -> str:
