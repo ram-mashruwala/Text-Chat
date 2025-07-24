@@ -1,5 +1,4 @@
 const form = document.querySelector(".message-send");
-let loggedIn = false
 let socket = io()
 
 
@@ -18,16 +17,10 @@ form.addEventListener("submit", (e) => {
 	const chat = document.querySelector(".messages")
 	e.preventDefault();
 	const input = form[0];
-	// Probably remove the login thingy once we get login page to work
-	if (loggedIn == false) {
-		socket.emit("setUserName", { "username": input.value })
-		loggedIn = true
-	} else {
-		socket.emit("message", {
-			"message": input.value
-		})
-		chat.innerHTML += ` <div class='message sent'> <span>YOU</span> <p>${input.value}</p> </div>`
-	}
+	socket.emit("message", {
+		"message": input.value
+	})
+	chat.innerHTML += ` <div class='message sent'> <span>YOU</span> <p>${input.value}</p> </div>`
 	input.value = "";
-	chat.scrollTop = chat.scrollHeight
+	chat.scrolltop = chat.scrollheight
 })

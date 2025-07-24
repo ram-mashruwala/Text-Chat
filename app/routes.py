@@ -1,21 +1,24 @@
+from urllib.parse import urlsplit
 from app import app, socketio
 from flask import render_template, flash, redirect, request, session, url_for
 from app.forms import LoginForm, RegisterForm
 from flask_socketio import emit
 import sqlalchemy as sa
-from flask_login import login_user, current_user, logout_user
+from flask_login import login_required, login_user, current_user, logout_user
 from app import db
 from app.models import User
 
 @app.route("/")
 @app.route("/index")
+@login_required
 def index():
-    return render_template("template.html")
+    print(current_user)
+    return render_template("index.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if current_user.is_authenticated():
-        redirect(url_for("template"))
+    if current_user.is_authenticated:
+        redirect(url_for("index"))
     form = LoginForm()
     if form.validate_on_submit():
         select_stmt = sa.select(User).where(User.username == form.username.data)
@@ -24,15 +27,24 @@ def login():
             flash("Invalid Username or Password")
             return redirect(url_for("login"))
         login_user(user, remember=form.remember_me.data)
-        return redirect(url_for("template"))
+        next_page = request.args.get("next")
+        if not next_page or urlsplit(next_page).netloc != "":
+            return redirect(url_for("index"))
+        return redirect(url_for(next_page))
     return render_template("login.html", form=form)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for("index"))
     form = RegisterForm()
     if form.validate_on_submit():
-        return redirect(url_for("login"))
-    return render_template("register.html", title="Register", form=form)
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        redirect(url_for("login"))
+    return render_template("register.html", form=form)
 
 @app.route("/terms-and-conditions")
 def termsAndConditions():
@@ -49,8 +61,4 @@ def disconnect():
 
 @socketio.on("message")
 def message(data):
-    emit("message", {"message": data["message"], "author": session["username"]}, broadcast=True, include_self=False)
-
-@socketio.on("setUserName")
-def getUserName(data):
-    session["username"] = data["username"]
+    emit("message", {"message": data["message"], "author": current_user.username}, broadcast=True, include_self=False)
