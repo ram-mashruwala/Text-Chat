@@ -28,7 +28,7 @@ def login():
             return redirect(url_for("login"))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get("next")
-        if not next_page or urlsplit(next_page).netloc != "":
+        if not next_page or urlsplit(next_page).netloc != "" or next_page == "/":
             return redirect(url_for("index"))
         return redirect(url_for(next_page))
     return render_template("login.html", form=form)
@@ -43,7 +43,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        redirect(url_for("login"))
+        return redirect(url_for("login"))
     return render_template("register.html", form=form)
 
 @app.route("/terms-and-conditions")

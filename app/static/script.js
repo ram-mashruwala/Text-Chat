@@ -17,10 +17,12 @@ form.addEventListener("submit", (e) => {
 	const chat = document.querySelector(".messages")
 	e.preventDefault();
 	const input = form[0];
-	socket.emit("message", {
-		"message": input.value
-	})
-	chat.innerHTML += ` <div class='message sent'> <span>YOU</span> <p>${input.value}</p> </div>`
-	input.value = "";
-	chat.scrolltop = chat.scrollheight
+	if (input.value != "") {
+		socket.emit("message", {
+			"message": input.value
+		})
+		chat.innerHTML += ` <div class='message sent'> <span>YOU</span> <p>${input.value}</p> </div>`
+		input.value = "";
+		chat.scrollTop = chat.scrollHeight
+	}
 })
