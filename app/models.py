@@ -1,7 +1,8 @@
+from flask_login import UserMixin
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing import List, Optional
-from app import db
+from app import db,  login
 from sqlalchemy import Column, ForeignKey, Table, String
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
@@ -11,7 +12,7 @@ association_table = Table(
     Column("chat_id", ForeignKey("chats.id"), primary_key=True)
 )
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -30,6 +31,10 @@ class User(db.Model):
 
     def __repr__(self) -> str:
         return f"<User id={self.id} username={self.username} email={self.email}>"
+
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
 
 class Chats(db.Model):
     __tablename__ = "chats"
