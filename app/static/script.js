@@ -9,10 +9,13 @@ socket.on("connect", (data) => {
 })
 
 socket.on("message", (data) => {
-	document.querySelector(".messages").innerHTML += ` <div class='message received'> <span>${data.author}</span> <p>${data.message}</p> </div>`
+	const chat = document.querySelector(".messages")
+	chat.innerHTML += ` <div class='message received'> <span>${data.author}</span> <p>${data.message}</p> </div>`
+	chat.scrollTop = chat.scrollHeight
 })
 
 form.addEventListener("submit", (e) => {
+	const chat = document.querySelector(".messages")
 	e.preventDefault();
 	const input = form[0];
 	// Probably remove the login thingy once we get login page to work
@@ -23,7 +26,8 @@ form.addEventListener("submit", (e) => {
 		socket.emit("message", {
 			"message": input.value
 		})
-		document.querySelector(".messages").innerHTML += ` <div class='message sent'> <span>YOU</span> <p>${input.value}</p> </div>`
+		chat.innerHTML += ` <div class='message sent'> <span>YOU</span> <p>${input.value}</p> </div>`
 	}
 	input.value = "";
+	chat.scrollTop = chat.scrollHeight
 })
