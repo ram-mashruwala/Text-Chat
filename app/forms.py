@@ -22,12 +22,12 @@ class RegisterForm(FlaskForm):
 
     def validate_username(self, username):
         select_stmt = select(User).where(User.username == username.data)
-        u = db.session.scalar(select_stmt)
-        if u:
+        user = db.session.scalar(select_stmt)
+        if user:
             raise ValidationError("Username Already Exists! Please pick a new one!")
 
     def validate_email(self, email):
         select_stmt = select(User).where(User.email == email.data)
-        u = db.session.scalar(select_stmt)
-        if u:
+        user = db.session.scalar(select_stmt)
+        if user:
             raise ValidationError("Email Already Exists! Please pick a new one!!!")
