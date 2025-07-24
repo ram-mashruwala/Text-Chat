@@ -23,6 +23,13 @@
       {% endfor %}
     </div>
     <div>
+      {{ form.remember_me.label(class_="form-label") }}
+      {{ form.remember_me(class_="form-check-input") }}
+            {% for error in form.remember_me.errors %}
+      <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+    </div>
+    <div>
       {{ form.submit(class_="btn btn-primary w-100") }}
     </div>
   </form>

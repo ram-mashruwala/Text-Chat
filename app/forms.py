@@ -10,6 +10,7 @@ from app.models import User
 class LoginForm(FlaskForm):
     username = StringField(label="Username", validators=[DataRequired()])
     password = PasswordField(label="Password", validators=[DataRequired()])
+    remember_me = BooleanField(label="Remember Me")
     submit = SubmitField(label="Sign In")
 
 class RegisterForm(FlaskForm):
@@ -19,5 +20,14 @@ class RegisterForm(FlaskForm):
     resubmit_password = StringField(label="Resubmit Password", validators=[DataRequired(), EqualTo("password")])
     submit = SubmitField(label="Register")
 
-    # This is here to remember additional functionality
-    # def validate_<field_name>(self, <field_name>): This will tell WTForm to also use this to validate the user input on given <field_name>
+    def validate_username(self, username):
+        select_stmt = select(User).where(User.username == username.data)
+        u = db.session.scalar(select_stmt)
+        if u:
+            raise ValidationError("Username Already Exists! Please pick a new one!")
+
+    def validate_email(self, email):
+        select_stmt = select(User).where(User.email == email.data)
+        u = db.session.scalar(select_stmt)
+        if u:
+            raise ValidationError("Email Already Exists! Please pick a new one!!!")
