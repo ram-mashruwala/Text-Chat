@@ -46,6 +46,11 @@ def register():
         return redirect(url_for("login"))
     return render_template("register.html", form=form)
 
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for("index"))
+
 @app.route("/terms-and-conditions")
 def termsAndConditions():
     return render_template("terms.html")
@@ -57,7 +62,6 @@ def connect(auth):
 @socketio.event
 def disconnect():
     print(f"Disconnected on server end, with connection id being {request.sid}")
-    logout_user()
 
 @socketio.on("message")
 def message(data):
