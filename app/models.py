@@ -65,3 +65,14 @@ class Messages(db.Model):
     def __repr__(self) -> str:
         return f"<Messages id={self.id} timestamp={self.timestamp} text={self.text} author-username={self.author.username}>"
 
+class ActiveUsers(db.Model):
+    __tablename__ = "active_users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    connection_id: Mapped[str]
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+
+    user: Mapped[User] = relationship()
+
+    def __repr__(self) -> str:
+        return f"<ActiveUser id={self.id} user.username={self.user.username} connection_id={self.connection_id}>"
