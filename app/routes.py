@@ -1,6 +1,6 @@
 from urllib.parse import urlsplit
 from app import app, socketio
-from flask import render_template, flash, redirect, request, session, url_for
+from flask import render_template, flash, redirect, request, url_for
 from app.forms import LoginForm, RegisterForm
 from flask_socketio import emit
 import sqlalchemy as sa
