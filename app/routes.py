@@ -4,6 +4,7 @@ from flask import render_template, flash, redirect, request, session, url_for
 from app.forms import LoginForm, RegisterForm
 from flask_socketio import emit
 import sqlalchemy as sa
+import sqlalchemy.orm as orm
 from flask_login import login_required, login_user, current_user, logout_user
 from app import db
 from app.models import User
@@ -12,8 +13,14 @@ from app.models import User
 @app.route("/index")
 @login_required
 def index():
-    print(current_user)
-    return render_template("index.html")
+    with orm.Session(db.engine) as session:
+        select_stmt = sa.select(User.username).where(User.username != current_user.username)
+        temp_users = session.execute(select_stmt).all()
+        users = []
+        for r in temp_users:
+            users.append(r.username)
+        print(users)
+    return render_template("index.html", users=users)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -30,7 +37,7 @@ def login():
         next_page = request.args.get("next")
         if not next_page or urlsplit(next_page).netloc != "" or next_page == "/":
             return redirect(url_for("index"))
-        return redirect(url_for(next_page))
+        return redirect(url_for(next_page[1:]))
     return render_template("login.html", form=form)
 
 @app.route("/register", methods=["GET", "POST"])
@@ -43,6 +50,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+        socketio.emit("addChat", {"username": form.username.data})
         return redirect(url_for("login"))
     return render_template("register.html", form=form)
 

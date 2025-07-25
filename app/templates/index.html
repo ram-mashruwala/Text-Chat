@@ -6,22 +6,24 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="header">
-            <h1>ChatApp</h1>
+            <div>
+                <h1>ChatApp</h1>
+                <p>Wecome back {{current_user.username}}</p>
+            </div>
             <div class="icons">
                 <button>🔍</button>
                 <button>⚙️</button>
             </div>
         </div>
         <div class="chat-list">
-            <!-- {% for i in ["Last message...", "Last message...", "Hey, are you there?", "Let’s catch up later!", "Can you send me the file?"] %} -->
-            <!-- <div class="chat"> -->
-            <!--     <img src="profile{{ loop.index }}.jpg" alt="Profile"> -->
-            <!--     <div class="chat-info"> -->
-            <!--         <h2>User {{ loop.index }}</h2> -->
-            <!--         <p>{{ i }}</p> -->
-            <!--     </div> -->
-            <!-- </div> -->
-            <!-- {% endfor %} -->
+            {% for i in users %}
+            <div class="chat">
+                <img src="../static/blankProfile.png" alt="Profile">
+                <div class="chat-info">
+                    <h2>{{ i }}</h2>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 

@@ -1,4 +1,6 @@
 const form = document.querySelector(".message-send");
+const chat = document.querySelectorAll(".chat")
+console.log(chat)
 let socket = io()
 
 
@@ -11,6 +13,17 @@ socket.on("message", (data) => {
 	const chat = document.querySelector(".messages")
 	chat.innerHTML += ` <div class='message received'> <span>${data.author}</span> <p>${data.message}</p> </div>`
 	chat.scrollTop = chat.scrollHeight
+})
+
+socket.on("addChat", (data) => {
+	const chats = document.querySelector(".chat-list")
+	chats.innerHTML += ` <div class="chat">
+                <img src="../static/blankProfile.png" alt="Profile">
+                <div class="chat-info">
+                    <h2>${data["username"]}</h2>
+                </div>
+            </div>`
+
 })
 
 form.addEventListener("submit", (e) => {
@@ -26,3 +39,5 @@ form.addEventListener("submit", (e) => {
 		chat.scrollTop = chat.scrollHeight
 	}
 })
+
+
