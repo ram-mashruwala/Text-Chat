@@ -1,26 +1,33 @@
+from typing import List
 from urllib.parse import urlsplit
 from app import app, socketio
-from flask import render_template, flash, redirect, request, url_for
+from flask import render_template, flash, redirect, request, url_for, session
 from app.forms import LoginForm, RegisterForm
-from flask_socketio import emit
+from flask_socketio import emit, join_room, leave_room
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from flask_login import login_required, login_user, current_user, logout_user
 from app import db
-from app.models import User
+from app.models import ActiveUsers, Chats, Messages, User
 
 @app.route("/")
 @app.route("/index")
 @login_required
 def index():
+    chats_id = []
+    chats_name = []
     with orm.Session(db.engine) as session:
-        select_stmt = sa.select(User.username).where(User.username != current_user.username)
-        temp_users = session.execute(select_stmt).all()
-        users = []
-        for r in temp_users:
-            users.append(r.username)
-        print(users)
-    return render_template("index.html", users=users)
+        select_stmt = sa.select(Chats)
+        chats = session.execute(select_stmt)
+        for c in chats:
+            if not current_user in c[0].users:
+                continue
+
+            chats_id.append(str(c[0].id))
+            if not c[0].name:
+                chats_name.append(createTempChatName(c[0].users))
+
+    return render_template("index.html", chats_id=chats_id, chats_name=chats_name)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -35,6 +42,7 @@ def login():
             return redirect(url_for("login"))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get("next")
+        session["current_room"] = None
         if not next_page or urlsplit(next_page).netloc != "" or next_page == "/":
             return redirect(url_for("index"))
         return redirect(url_for(next_page[1:]))
@@ -65,12 +73,71 @@ def termsAndConditions():
 
 @socketio.event
 def connect(auth):
+    with orm.Session(db.engine) as session:
+        select_stmt = sa.select(ActiveUsers).where(ActiveUsers.user_id == current_user.id)
+        user = session.execute(select_stmt).first()
+        if not user:
+            active_user = ActiveUsers(connection_id=request.sid, user_id=current_user.id)
+            session.add(active_user)
+            session.commit()
+            session.flush()
+
     print(f"Connected on server end, with connection id being {request.sid}")
+
 
 @socketio.event
 def disconnect():
+    with orm.Session(db.engine) as session:
+        select_stmt = sa.select(ActiveUsers).where(ActiveUsers.user_id == current_user.id)
+        u = session.execute(select_stmt).first()
+        if u:
+            session.delete(u[0])
+            session.commit()
+            session.flush()
+
     print(f"Disconnected on server end, with connection id being {request.sid}")
 
 @socketio.on("message")
 def message(data):
-    emit("message", {"message": data["message"], "author": current_user.username}, broadcast=True, include_self=False)
+    if not session["current_room"]:
+        return
+    emit("message",
+         {"message": data["message"], "author": current_user.username},
+         include_self=False,
+         room=session["current_room"])
+    with orm.Session(db.engine) as s:
+        select_stmt = sa.select(Chats).where(Chats.id == int(session["current_room"]))
+        chat = s.scalar(select_stmt)
+        if not chat:
+            return
+
+        if not chat.messages:
+            chat.messages = []
+        message = Messages(chat=chat, text=data["message"], author_id=current_user.id)
+        s.add(message)
+        s.commit()
+
+@socketio.on("requestUserName")
+def requestUserName():
+    emit("getUserName", {"username": current_user.username})
+
+
+
+
+@socketio.on("joinChat")
+def joinChat(data):
+    if not current_user.is_authenticated:
+        return
+    if session["current_room"]:
+        leave_room(session["current_room"])
+    session["current_room"] = data["new_room"]
+    join_room(session["current_room"])
+
+
+def createTempChatName(users: List[User]) -> str:
+    answer = ""
+    for user in users:
+        answer += f" {user.username}"
+
+    return answer
+

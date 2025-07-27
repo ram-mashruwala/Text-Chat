@@ -16,8 +16,8 @@
             </div>
         </div>
         <div class="chat-list">
-            {% for i in users %}
-            <div class="chat">
+            {% for i in chats_name %}
+            <div class="chat" onclick="joinChat('{{ chats_id[loop.index - 1] }}')">
                 <img src="../static/blankProfile.png" alt="Profile">
                 <div class="chat-info">
                     <h2>{{ i }}</h2>
@@ -38,16 +38,6 @@
             </div>
         </div>
         <div class="messages">
-            <!-- {% for i in range(11) %} -->
-            <!-- <div class="message sent"> -->
-            <!--     <span>Guy thingy!</span> -->
-            <!--     <p>Hello!</p> -->
-            <!-- </div> -->
-            <!-- <div class="message received"> -->
-            <!--     <span>Another guy</span> -->
-            <!--     <p>Hi there!</p> -->
-            <!-- </div> -->
-            <!-- {% endfor %} -->
         </div>
         <div class="message-input">
             <button>😊</button>

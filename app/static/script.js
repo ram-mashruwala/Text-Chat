@@ -1,12 +1,12 @@
 const form = document.querySelector(".message-send");
 const chat = document.querySelectorAll(".chat")
-console.log(chat)
+let username = ""
 let socket = io()
 
 
 socket.on("connect", (data) => {
 	console.log("Connected on User end")
-	// Once we figure out the settings we should add a socket.emit that requests all previous messages in current room and all user settings
+	socket.emit("requestUserName")
 })
 
 socket.on("message", (data) => {
@@ -26,6 +26,10 @@ socket.on("addChat", (data) => {
 
 })
 
+socket.on("getUserName", (data) => {
+	username = data["username"]
+})
+
 form.addEventListener("submit", (e) => {
 	const chat = document.querySelector(".messages")
 	e.preventDefault();
@@ -34,10 +38,17 @@ form.addEventListener("submit", (e) => {
 		socket.emit("message", {
 			"message": input.value
 		})
-		chat.innerHTML += ` <div class='message sent'> <span>YOU</span> <p>${input.value}</p> </div>`
+		chat.innerHTML += ` <div class='message sent'> <span>${username}</span> <p>${input.value}</p> </div>`
 		input.value = "";
 		chat.scrollTop = chat.scrollHeight
 	}
 })
+
+
+function joinChat(chatName) {
+	socket.emit("joinChat", { "new_room": chatName })
+	const chat = document.querySelector(".messages")
+	chat.innerHTML = ""
+}
 
 
