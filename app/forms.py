@@ -18,7 +18,12 @@ class RegisterForm(FlaskForm):
     email = StringField(label="Email", validators=[DataRequired(), Email()])
     password = StringField(label="Password", validators=[DataRequired()])
     resubmit_password = StringField(label="Resubmit Password", validators=[DataRequired(), EqualTo("password")])
+    terms = BooleanField(label="Terms and Conditions")
     submit = SubmitField(label="Register")
+
+    def validate_terms(self, terms):
+        if not terms.data:
+            raise ValidationError("You Have to Accept the very fair Terms and Conditions!")
 
     def validate_username(self, username):
         select_stmt = select(User).where(User.username == username.data)
@@ -30,4 +35,4 @@ class RegisterForm(FlaskForm):
         select_stmt = select(User).where(User.email == email.data)
         user = db.session.scalar(select_stmt)
         if user:
-            raise ValidationError("Email Already Exists! Please pick a new one!!!")
+            raise ValidationError("Email Already Exists! Please pick a new one!")

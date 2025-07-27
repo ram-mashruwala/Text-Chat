@@ -38,6 +38,15 @@
       <span style="color: red;">[{{ error }}]</span>
       {% endfor %}
     </div>
+    <div class="mb-3">
+      {{ form.terms.label(class_="form-label") }}
+      {{ form.terms(class_="form-check-input") }}
+      <br>
+            {% for error in form.terms.errors %}
+      <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+      <p>To see the terms and conditions click <a href="/terms-and-conditions">here</a></p>
+    </div>
     <div>
       {{ form.submit(class_="btn btn-primary w-100") }}
     </div>
