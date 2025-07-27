@@ -46,6 +46,7 @@ class Chats(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     users: Mapped[List[User]] = relationship(secondary=association_table, back_populates="chats")
     messages: Mapped[Optional[List["Messages"]]] = relationship(back_populates="chat", cascade="all, delete-orphan")
+    name: Mapped[Optional[str]]
 
     def __repr__(self) -> str:
         return f"<Chats id={self.id}>"
@@ -57,8 +58,8 @@ class Messages(db.Model):
     chat_id: Mapped[int] = mapped_column(ForeignKey("chats.id"))
     chat: Mapped[Chats] = relationship(back_populates="messages")
     timestamp: Mapped[datetime] = mapped_column(default=datetime.utcnow)
-    text: Mapped[str] = mapped_column(ForeignKey("user.id"))
-    author_id: Mapped[int]
+    text: Mapped[str]
+    author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
     author: Mapped[User] = relationship()
 
