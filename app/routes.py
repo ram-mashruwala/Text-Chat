@@ -16,9 +16,9 @@ from app.models import ActiveUsers, Chats, Messages, User
 def index():
     chats_id = []
     chats_name = []
-    with orm.Session(db.engine) as session:
+    with orm.Session(db.engine) as s:
         select_stmt = sa.select(Chats)
-        chats = session.execute(select_stmt)
+        chats = s.execute(select_stmt)
         for c in chats:
             if not current_user in c[0].users:
                 continue
@@ -28,7 +28,7 @@ def index():
                 temp_name = createTempChatName(c[0].users)
                 chats_name.append(temp_name)
                 c[0].name = temp_name
-                session.commit()
+                s.commit()
             else:
                 chats_name.append(c[0].name)
 
@@ -78,27 +78,27 @@ def termsAndConditions():
 
 @socketio.event
 def connect(auth):
-    with orm.Session(db.engine) as session:
+    with orm.Session(db.engine) as s:
         select_stmt = sa.select(ActiveUsers).where(ActiveUsers.user_id == current_user.id)
-        user = session.execute(select_stmt).first()
+        user = s.execute(select_stmt).first()
         if not user:
             active_user = ActiveUsers(connection_id=request.sid, user_id=current_user.id)
-            session.add(active_user)
-            session.commit()
-            session.flush()
+            s.add(active_user)
+            s.commit()
+            s.flush()
 
     print(f"Connected on server end, with connection id being {request.sid}")
 
 
 @socketio.event
 def disconnect():
-    with orm.Session(db.engine) as session:
+    with orm.Session(db.engine) as s:
         select_stmt = sa.select(ActiveUsers).where(ActiveUsers.user_id == current_user.id)
-        u = session.scalar(select_stmt)
+        u = s.scalar(select_stmt)
         if u:
-            session.delete(u)
-            session.commit()
-            session.flush()
+            s.delete(u)
+            s.commit()
+            s.flush()
 
     print(f"Disconnected on server end, with connection id being {request.sid}")
 
@@ -121,6 +121,7 @@ def message(data):
         message = Messages(chat=chat, text=data["message"], author_id=current_user.id)
         s.add(message)
         s.commit()
+        s.flush()
 
 @socketio.on("requestUserName")
 def requestUserName():
