@@ -25,7 +25,12 @@ def index():
 
             chats_id.append(str(c[0].id))
             if not c[0].name:
-                chats_name.append(createTempChatName(c[0].users))
+                temp_name = createTempChatName(c[0].users)
+                chats_name.append(temp_name)
+                c[0].name = temp_name
+                session.commit()
+            else:
+                chats_name.append(c[0].name)
 
     return render_template("index.html", chats_id=chats_id, chats_name=chats_name)
 
@@ -89,9 +94,9 @@ def connect(auth):
 def disconnect():
     with orm.Session(db.engine) as session:
         select_stmt = sa.select(ActiveUsers).where(ActiveUsers.user_id == current_user.id)
-        u = session.execute(select_stmt).first()
+        u = session.scalar(select_stmt)
         if u:
-            session.delete(u[0])
+            session.delete(u)
             session.commit()
             session.flush()
 
@@ -135,9 +140,9 @@ def joinChat(data):
 
 
 def createTempChatName(users: List[User]) -> str:
-    answer = ""
-    for user in users:
-        answer += f" {user.username}"
+    answer = users[0].username
+    for user in users[1:]:
+        answer += f", {user.username}"
 
     return answer
 

@@ -64,7 +64,7 @@ class Messages(db.Model):
     author: Mapped[User] = relationship()
 
     def __repr__(self) -> str:
-        return f"<Messages id={self.id} timestamp={self.timestamp} text={self.text} author-username={self.author.username}>"
+        return f"<Messages id={self.id} timestamp={self.timestamp} text={self.text} author-username={self.author.username} chat-name={self.chat.name}>"
 
 class ActiveUsers(db.Model):
     __tablename__ = "active_users"
