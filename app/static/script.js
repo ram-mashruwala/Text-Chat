@@ -1,3 +1,4 @@
+const messages = document.querySelector(".messages")
 const form = document.querySelector(".message-send");
 const chat = document.querySelectorAll(".chat")
 let username = ""
@@ -10,9 +11,7 @@ socket.on("connect", (data) => {
 })
 
 socket.on("message", (data) => {
-	const chat = document.querySelector(".messages")
-	chat.innerHTML += ` <div class='message received'> <span>${data.author}</span> <p>${data.message}</p> </div>`
-	chat.scrollTop = chat.scrollHeight
+	addMessage(data.author, data.message, false)
 })
 
 socket.on("addChat", (data) => {
@@ -20,27 +19,35 @@ socket.on("addChat", (data) => {
 	chats.innerHTML += ` <div class="chat">
                 <img src="../static/blankProfile.png" alt="Profile">
                 <div class="chat-info">
-                    <h2>${data["username"]}</h2>
+                    <h2>${data.username}</h2>
                 </div>
             </div>`
 
 })
 
 socket.on("getUserName", (data) => {
-	username = data["username"]
+	username = data.username
+})
+
+socket.on("getMessages", (data) => {
+	for (let i = 0; i < data.text.length; i++) {
+		let sent = false
+		if (data.authors[i] === username) {
+			sent = true
+		}
+		addMessage(data.authors[i], data.text[i], sent)
+	}
 })
 
 form.addEventListener("submit", (e) => {
-	const chat = document.querySelector(".messages")
 	e.preventDefault();
 	const input = form[0];
 	if (input.value != "") {
 		socket.emit("message", {
 			"message": input.value
 		})
-		chat.innerHTML += ` <div class='message sent'> <span>${username}</span> <p>${input.value}</p> </div>`
+		addMessage(username, input.value, true)
 		input.value = "";
-		chat.scrollTop = chat.scrollHeight
 	}
 })
 
@@ -51,4 +58,11 @@ function joinChat(chatName) {
 	chat.innerHTML = ""
 }
 
-
+function addMessage(author, text, sent) {
+	if (sent) {
+		messages.innerHTML += ` <div class='message sent'> <span>${author}</span> <p>${text}</p> </div>`
+	} else {
+		messages.innerHTML += ` <div class='message received'> <span>${author}</span> <p>${text}</p> </div>`
+	}
+	messages.scrollTop = messages.scrollHeight
+}

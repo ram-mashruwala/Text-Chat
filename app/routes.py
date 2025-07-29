@@ -16,28 +16,26 @@ from app.models import ActiveUsers, Chats, Messages, User
 def index():
     chats_id = []
     chats_name = []
-    with orm.Session(db.engine) as s:
-        select_stmt = sa.select(Chats)
-        chats = s.execute(select_stmt)
-        for c in chats:
-            if not current_user in c[0].users:
-                continue
-
-            chats_id.append(str(c[0].id))
-            if not c[0].name:
-                temp_name = createTempChatName(c[0].users)
-                chats_name.append(temp_name)
-                c[0].name = temp_name
-                s.commit()
-            else:
-                chats_name.append(c[0].name)
+    chats = db.session.scalars(sa.select(Chats)).all()
+    for chat in chats:
+        if not current_user in chat.users:
+            continue
+        chats_id.append(str(chat.id))
+        if not chat.name:
+            temp_name = createTempChatName(chat.users)
+            chats_name.append(temp_name)
+            chat.name = temp_name
+        else:
+            chats_name.append(chat.name)
+        db.session.commit()
+        db.session.flush()
 
     return render_template("index.html", chats_id=chats_id, chats_name=chats_name)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        redirect(url_for("index"))
+        return redirect(url_for("index"))
     form = LoginForm()
     if form.validate_on_submit():
         select_stmt = sa.select(User).where(User.username == form.username.data)
@@ -85,7 +83,6 @@ def connect(auth):
             active_user = ActiveUsers(connection_id=request.sid, user_id=current_user.id)
             s.add(active_user)
             s.commit()
-            s.flush()
 
     print(f"Connected on server end, with connection id being {request.sid}")
 
@@ -98,7 +95,6 @@ def disconnect():
         if u:
             s.delete(u)
             s.commit()
-            s.flush()
 
     print(f"Disconnected on server end, with connection id being {request.sid}")
 
@@ -116,12 +112,9 @@ def message(data):
         if not chat:
             return
 
-        if not chat.messages:
-            chat.messages = []
         message = Messages(chat=chat, text=data["message"], author_id=current_user.id)
         s.add(message)
         s.commit()
-        s.flush()
 
 @socketio.on("requestUserName")
 def requestUserName():
@@ -132,18 +125,30 @@ def requestUserName():
 
 @socketio.on("joinChat")
 def joinChat(data):
-    if not current_user.is_authenticated:
+    chat = db.session.get(Chats, int(data["new_room"]))
+    if not current_user.is_authenticated or not chat:
         return
     if session["current_room"]:
         leave_room(session["current_room"])
     session["current_room"] = data["new_room"]
     join_room(session["current_room"])
 
+    authors = []
+    text = []
+    for message in chat.messages:
+        authors.append(message.author.username)
+        text.append(message.text)
+    emit("getMessages", {"authors": authors, "text": text})
+
+
+
 
 def createTempChatName(users: List[User]) -> str:
-    answer = users[0].username
-    for user in users[1:]:
+    answer = ""
+    for user in users:
+        if user.id == current_user.id:
+            continue
         answer += f", {user.username}"
 
-    return answer
+    return answer[2:]
 
