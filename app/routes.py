@@ -146,8 +146,6 @@ def joinChat(data):
 def createTempChatName(users: List[User]) -> str:
     answer = ""
     for user in users:
-        if user.id == current_user.id:
-            continue
         answer += f", {user.username}"
 
     return answer[2:]
