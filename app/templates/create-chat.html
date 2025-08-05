@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Creating Chats</title>
+<link rel="stylesheet" href="../static/create-chat.css">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="smaller-container">
+        <h1>Create Group Chat</h1>
+        <div class="search-holder">
+            <form class="inputer-form">
+                <input class="inputer" placeholder="Enter Users Name">
+                <button class="submit-button" onclick="console.log('CLICKED')">Add User</button>
+            </form>
+            <form class="second-form">
+                <input placeholder="Enter the Chats Name">
+                <button class="submit-button" onclick="console.log('CLICKED')">Submit</button>
+            </form>
+            <div class="user-holder">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const SCRIPT_ROOT = {{ request.script_root|tojson }}
+    const indexURL = {{ url_for("index")|tojson }}
+    const createChatURL = {{ url_for("chatCreator")|tojson }}
+
+</script>
+<script src="../static/create-chat.js"></script>
+{% endblock %}
