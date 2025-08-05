@@ -1,13 +1,12 @@
-from typing import List
 from urllib.parse import urlsplit
-from app import app, socketio
+from itsdangerous import url_safe
+from app import app, socketio, db
 from flask import render_template, flash, redirect, request, url_for, session
 from app.forms import LoginForm, RegisterForm
 from flask_socketio import emit, join_room, leave_room
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from flask_login import login_required, login_user, current_user, logout_user
-from app import db
 from app.models import ActiveUsers, Chats, Messages, User
 
 @app.route("/")
@@ -61,9 +60,21 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        socketio.emit("addChat", {"username": form.username.data})
         return redirect(url_for("login"))
     return render_template("register.html", form=form)
+
+@app.route("/createChat", methods=["GET", "POST"])
+@login_required
+def chatCreator():
+    if request.method == "POST":
+        users_str = request.form.get("users")
+        name = request.form.get("name")
+        if not users_str or not name:
+            return render_template("create-chat.html")
+        users = users_str.split(",")
+        createChat(users=users, name=name)
+        return redirect(url_for("index"))
+    return render_template("create-chat.html")
 
 @app.route("/logout")
 def logout():
@@ -120,8 +131,13 @@ def message(data):
 def requestUserName():
     emit("getUserName", {"username": current_user.username})
 
-
-
+@socketio.on("changeChatName")
+def changeChatName(data):
+    chat = db.session.scalar(sa.select(Chats).where(Chats.id == data["chat_id"]))
+    if not chat:
+        return
+    chat.name = data["new_chat_name"]
+    db.session.commit()
 
 @socketio.on("joinChat")
 def joinChat(data):
@@ -140,13 +156,33 @@ def joinChat(data):
         text.append(message.text)
     emit("getMessages", {"authors": authors, "text": text})
 
+def createChat(users: list[str], name: str) -> None:
+    if not current_user.username in users:
+        users.append(current_user.username)
 
+    chats_users: list[User] = []
 
+    for username in users:
+        user = db.session.scalar(sa.select(User).where(User.username == username))
+        if not user:
+            print(f"this guys isnt a real users lmao {username}")
+            return
+        chats_users.append(user)
 
-def createTempChatName(users: List[User]) -> str:
+    if not name:
+        name = createTempChatName(users=chats_users)
+    new_chat = Chats(users=chats_users, name=name)
+    db.session.add(new_chat)
+    db.session.commit()
+
+    # Tried to update it in real time, but didn't work, will try again tomorrow
+    # for user in chats_users:
+    #     connection_id = db.session.scalar(sa.select(ActiveUsers).where(ActiveUsers.user_id == user.id))
+    #     socketio.emit("addChat", {"chat_id": new_chat.id, "chat_name": new_chat.name})
+
+def createTempChatName(users: list[User]) -> str:
     answer = ""
     for user in users:
         answer += f", {user.username}"
 
     return answer[2:]
-

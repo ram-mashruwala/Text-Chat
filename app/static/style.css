@@ -1,3 +1,9 @@
+* {
+  padding: 0px;
+  margin: 0px;
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -133,6 +139,44 @@ body {
   border: 1px solid #ddd;
   border-radius: 5px;
 }
+
+.icons input {
+  padding: 10px;
+  margin: 0 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.search {
+  display: inline-block;
+  position: relative;
+}
+
+.search ul {
+  position: absolute;
+  list-style-type: none;
+  background-color: white;
+  border: 10px;
+  left: 0;
+  top: 120%;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.search ul li {
+  padding: 1em;
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.15s;
+}
+
+
+.search ul li:hover {
+  background-color: #ddd;
+}
+
+
 
 /* Got these animations from a website, Probably change */
 

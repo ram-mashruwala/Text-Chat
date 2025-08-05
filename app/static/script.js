@@ -16,10 +16,10 @@ socket.on("message", (data) => {
 
 socket.on("addChat", (data) => {
 	const chats = document.querySelector(".chat-list")
-	chats.innerHTML += ` <div class="chat">
+	chats.innerHTML += ` <div class="chat" onclick="joinChat(${data.chat_id})">
                 <img src="../static/blankProfile.png" alt="Profile">
                 <div class="chat-info">
-                    <h2>${data.username}</h2>
+                    <h2>${data.chat_name}</h2>
                 </div>
             </div>`
 
@@ -37,6 +37,11 @@ socket.on("getMessages", (data) => {
 		}
 		addMessage(data.authors[i], data.text[i], sent)
 	}
+})
+
+socket.on("displayErrorMessage", (data) => {
+	// Probably replace this with a splash screen of sorts
+	console.error(data["message"])
 })
 
 form.addEventListener("submit", (e) => {
@@ -65,4 +70,10 @@ function addMessage(author, text, sent) {
 		messages.innerHTML += ` <div class='message received'> <span>${author}</span> <p>${text}</p> </div>`
 	}
 	messages.scrollTop = messages.scrollHeight
+}
+
+function changeChatName(newName, id) {
+	if (newName !== "") {
+		socket.emit("changeChatName", { "new_chat_name": newName, "chat_id": id })
+	}
 }
