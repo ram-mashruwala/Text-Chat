@@ -9,6 +9,8 @@ import sqlalchemy.orm as orm
 from flask_login import login_required, login_user, current_user, logout_user
 from app.models import ActiveUsers, Chats, Messages, User
 
+# We have refactor this code to split this code up into different blueprints
+
 @app.route("/")
 @app.route("/index")
 @login_required
